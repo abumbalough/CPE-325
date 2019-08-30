@@ -44,12 +44,24 @@ Notes: Solution adapted from Stack Overflow user Paul Hankin https://stackoverfl
 ------------
 */
 
+void part_1();
+
+void part_2();
+
 void print_data_type_info(int);
 
 int main(void)
 {
 	WDTCTL = WDTPW | WDTHOLD;	// stop watchdog timer
 	
+	part_1();
+	
+	part_2();
+	
+	return 0;
+}
+
+void part_1() {
 	// Print table header row
 	int i;
 	for (i=0;i<TABLE_WIDTH;i++) printf("-");
@@ -66,8 +78,10 @@ int main(void)
 	// Print last row of table
 	for (i=0;i<TABLE_WIDTH;i++) printf("-");
 	printf("\n");
-	
-	return 0;
+}
+
+void part_2() {
+	printf("\nPart 2 not yet implemented.\n");
 }
 
 void print_data_type_info(int i) {
