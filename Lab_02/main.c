@@ -44,6 +44,8 @@ void part_1();
 
 void part_2();
 
+void bonus();
+
 void print_data_type_info(int);
 
 int main(void)
@@ -53,6 +55,8 @@ int main(void)
 	part_1();
 	
 	part_2();
+	
+	bonus();
 	
 	return 0;
 }
@@ -77,16 +81,20 @@ void part_1() {
 }
 
 void part_2() {
+	
+	// Declare variables for input array, constants, and output array
 	int x[ARR_LEN] = {-3, -2, -1, 0, 1, 2, 3};
 	int m = 5;
 	int c = -2;
 	int y[7];
 	
+	// Comput output array using y = mx+c
 	int i;
 	for (i=0;i<ARR_LEN;i++) {
 		y[i] = (m * x[i]) + c;
 	}
 	
+	// Print each input array element
 	printf("Input Array X: [");
 	for (i=0;i<ARR_LEN;i++) {
 		if (!(i == ARR_LEN -1)) {
@@ -96,7 +104,11 @@ void part_2() {
 		}
 	}
 	printf("]\n");
+	
+	// Print constants
 	printf("Input Constants m: %d c: %d\n", m, c);
+	
+	// Print each output array element
 	printf("Output Array Y: [");
 	for (i=0;i<ARR_LEN;i++) {
 		if (!(i == ARR_LEN -1)) {
@@ -106,6 +118,106 @@ void part_2() {
 		}
 	}
 	printf("]\n");
+}
+
+void bonus() {
+	// Declare input and output matrices and iteration variables
+	int x[8][8] = {
+		{4, 3, 3, 8, 8, 9, 8, 9},
+		{3, 9, 3, 1, 7, 7, 9, 9},
+		{0, 0, 1, 8, 2, 4, 9, 6},
+		{5, 9, 4, 0, 4, 0, 3, 0},
+		{2, 7, 6, 2, 6, 5, 3, 5},
+		{0, 2, 0, 3, 8, 4, 4, 2},
+		{6, 4, 5, 4, 9, 7, 1, 5},
+		{2, 1, 4, 5, 0, 6, 8, 1}
+	};
+	
+	int i[8][8] = {
+		{1, 0, 0, 0, 0, 0, 0, 0},
+		{0, 1, 0, 0, 0, 0, 0, 0},
+		{0, 0, 1, 0, 0, 0, 0, 0},
+		{0, 0, 0, 1, 0, 0, 0, 0},
+		{0, 0, 0, 0, 1, 0, 0, 0},
+		{0, 0, 0, 0, 0, 1, 0, 0},
+		{0, 0, 0, 0, 0, 0, 1, 0},
+		{0, 0, 0, 0, 0, 0, 0, 1}
+	};
+	
+	int y[8][8];
+	
+	int j;
+	int k;
+	
+	for (j=0;j<8;j++) {
+		for (k=0;k<8;k++) {
+			int sum = 0;
+			int m = 0;
+			
+			// Multiply Row of X by Column of I and compute the sum
+			while (m < 8) {
+				sum += x[j][m]*i[m][k];
+				m++;
+			}
+			y[j][k] = sum;
+		}
+	}
+	
+	// Print input and output matrices
+	printf("\nInput Array X: [\n");
+	for (j=0;j<8;j++) {
+		printf("[");
+		for (k=0;k<8;k++) {
+			if (!(k == 7)) {
+				printf("%d ", x[j][k]);
+			} else {
+				printf("%d", x[j][k]);
+			}
+		}
+		if (!(j == 7)) {
+			printf("],\n");
+		} else {
+			printf("]\n");
+		}
+	}
+	printf("]\n");
+	
+	printf("\nInput Array I: [\n");
+	for (j=0;j<8;j++) {
+		printf("[");
+		for (k=0;k<8;k++) {
+			if (!(k == 7)) {
+				printf("%d ", i[j][k]);
+			} else {
+				printf("%d", i[j][k]);
+			}
+		}
+		if (!(j == 7)) {
+			printf("],\n");
+		} else {
+			printf("]\n");
+		}
+	}
+	printf("]\n");
+	
+	printf("\nOutput Array Y = XI: [\n");
+	for (j=0;j<8;j++) {
+		printf("[");
+		for (k=0;k<8;k++) {
+			if (!(k == 7)) {
+				printf("%d ", y[j][k]);
+			} else {
+				printf("%d", y[j][k]);
+			}
+		}
+		if (!(j == 7)) {
+			printf("],\n");
+		} else {
+			printf("]\n");
+		}
+	}
+	printf("]\n");
+	
 }
 
 void print_data_type_info(int i) {
