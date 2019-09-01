@@ -10,6 +10,8 @@
 #define COL_3_WIDTH -20
 #define COL_4_WIDTH -23
 
+#define ARR_LEN 7
+
 
 /*
 --------------------------------------------------------
@@ -32,17 +34,11 @@ Lab Section: 8
 *
 Date: 8/29/19
 *
-Notes: Solution adapted from Stack Overflow user Paul Hankin https://stackoverflow.com/a/14418659
+Notes: Part 1 solution adapted from Stack Overflow user Paul Hankin https://stackoverflow.com/a/14418659
 *
 --------------------------------------------------------
 */
 
-
-/*
-------------
-   PART 1
-------------
-*/
 
 void part_1();
 
@@ -81,7 +77,35 @@ void part_1() {
 }
 
 void part_2() {
-	printf("\nPart 2 not yet implemented.\n");
+	int x[ARR_LEN] = {-3, -2, -1, 0, 1, 2, 3};
+	int m = 5;
+	int c = -2;
+	int y[7];
+	
+	int i;
+	for (i=0;i<ARR_LEN;i++) {
+		y[i] = (m * x[i]) + c;
+	}
+	
+	printf("Input Array X: [");
+	for (i=0;i<ARR_LEN;i++) {
+		if (!(i == ARR_LEN -1)) {
+			printf("%d ", x[i]);
+		} else {
+			printf("%d", x[i]);
+		}
+	}
+	printf("]\n");
+	printf("Input Constants m: %d c: %d\n", m, c);
+	printf("Output Array Y: [");
+	for (i=0;i<ARR_LEN;i++) {
+		if (!(i == ARR_LEN -1)) {
+			printf("%d ", y[i]);
+		} else {
+			printf("%d", y[i]);
+		}
+	}
+	printf("]\n");
 }
 
 void print_data_type_info(int i) {
@@ -127,26 +151,3 @@ void print_data_type_info(int i) {
 			return;
 	}
 }
-/*
-------------
- END PART 1
-------------
-*/
-
-
-// /*
-// ------------
-//    PART 2
-// ------------
-// */
-// int main(void)
-// {
-//     WDTCTL = WDTPW | WDTHOLD;   // stop watchdog timer
-//
-//     return 0;
-// }
-// /*
-// ------------
-//  END PART 2
-// ------------
-// */
