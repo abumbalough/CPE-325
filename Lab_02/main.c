@@ -71,8 +71,9 @@ void part_1() {
 	printf("\n");
 	
 	// Print information for each data type
-	for (i=0;i<NUM_TYPES;i++) {
-		print_data_type_info(i);
+	int j;
+	for (j=0;j<NUM_TYPES;j++) {
+		print_data_type_info(j);
 	}
 	
 	// Print last row of table
@@ -84,8 +85,8 @@ void part_2() {
 	
 	// Declare variables for input array, constants, and output array
 	int x[ARR_LEN] = {-3, -2, -1, 0, 1, 2, 3};
-	int m = 5;
-	int c = -2;
+	int m = 1;
+	int c = 0;
 	int y[7];
 	
 	// Comput output array using y = mx+c
@@ -134,14 +135,14 @@ void bonus() {
 	};
 	
 	int i[8][8] = {
-		{1, 0, 0, 0, 0, 0, 0, 0},
-		{0, 1, 0, 0, 0, 0, 0, 0},
-		{0, 0, 1, 0, 0, 0, 0, 0},
-		{0, 0, 0, 1, 0, 0, 0, 0},
-		{0, 0, 0, 0, 1, 0, 0, 0},
-		{0, 0, 0, 0, 0, 1, 0, 0},
-		{0, 0, 0, 0, 0, 0, 1, 0},
-		{0, 0, 0, 0, 0, 0, 0, 1}
+		{2, 0, 0, 0, 0, 0, 0, 0},
+		{0, 2, 0, 0, 0, 0, 0, 0},
+		{0, 0, 2, 0, 0, 0, 0, 0},
+		{0, 0, 0, 2, 0, 0, 0, 0},
+		{0, 0, 0, 0, 2, 0, 0, 0},
+		{0, 0, 0, 0, 0, 2, 0, 0},
+		{0, 0, 0, 0, 0, 0, 2, 0},
+		{0, 0, 0, 0, 0, 0, 0, 2}
 	};
 	
 	int y[8][8];
@@ -224,40 +225,40 @@ void print_data_type_info(int i) {
 
 	switch(i) {
 		case 0: // Signed char
-			printf("| %*s| %*ld| %*d| %*d|\n", COL_1_WIDTH, "char", COL_2_WIDTH, sizeof(char), COL_3_WIDTH, SCHAR_MIN, COL_4_WIDTH, SCHAR_MAX);
+			printf("| %*s| %*d| %*d| %*d|\n", COL_1_WIDTH, "char", COL_2_WIDTH, sizeof(char), COL_3_WIDTH, SCHAR_MIN, COL_4_WIDTH, SCHAR_MAX);
 			break;
 		case 1: // Signed short int
-		    printf("| %*s| %*ld| %*d| %*d|\n", COL_1_WIDTH, "short int", COL_2_WIDTH, sizeof(short int), COL_3_WIDTH, SHRT_MIN, COL_4_WIDTH, SHRT_MAX);
+		    printf("| %*s| %*d| %*d| %*d|\n", COL_1_WIDTH, "short int", COL_2_WIDTH, sizeof(short int), COL_3_WIDTH, SHRT_MIN, COL_4_WIDTH, SHRT_MAX);
 			break;
 		case 2: // Signed int
-		    printf("| %*s| %*ld| %*d| %*d|\n", COL_1_WIDTH, "int", COL_2_WIDTH, sizeof(int), COL_3_WIDTH, INT_MIN, COL_4_WIDTH, INT_MAX);
+		    printf("| %*s| %*d| %*d| %*d|\n", COL_1_WIDTH, "int", COL_2_WIDTH, sizeof(int), COL_3_WIDTH, INT_MIN, COL_4_WIDTH, INT_MAX);
 			break;
 		case 3: // Signed long int
-		    printf("| %*s| %*ld| %*ld| %*ld|\n", COL_1_WIDTH, "long int", COL_2_WIDTH, sizeof(long int), COL_3_WIDTH, LONG_MIN, COL_4_WIDTH, LONG_MAX);
+		    printf("| %*s| %*d| %*ld| %*ld|\n", COL_1_WIDTH, "long int", COL_2_WIDTH, sizeof(long int), COL_3_WIDTH, LONG_MIN, COL_4_WIDTH, LONG_MAX);
 			break;
 		case 4: // Signed long long int
-		    printf("| %*s| %*ld| %*lld| %*lld|\n", COL_1_WIDTH, "long long int", COL_2_WIDTH, sizeof(long long int), COL_3_WIDTH, LLONG_MIN, COL_4_WIDTH, LLONG_MAX);
+		    printf("| %*s| %*d| %*lld| %*lld|\n", COL_1_WIDTH, "long long int", COL_2_WIDTH, sizeof(long long int), COL_3_WIDTH, LLONG_MIN, COL_4_WIDTH, LLONG_MAX);
 			break;
 		case 5: // Unsigned char
-		    printf("| %*s| %*ld| %*d| %*d|\n", COL_1_WIDTH, "unsigned char", COL_2_WIDTH, sizeof(unsigned char), COL_3_WIDTH, 0, COL_4_WIDTH, CHAR_MAX);
+		    printf("| %*s| %*d| %*d| %*d|\n", COL_1_WIDTH, "unsigned char", COL_2_WIDTH, sizeof(unsigned char), COL_3_WIDTH, 0, COL_4_WIDTH, CHAR_MAX);
 			break;
 		case 6: // Unsigned short int
-			printf("| %*s| %*ld| %*d| %*u|\n", COL_1_WIDTH, "unsigned short int", COL_2_WIDTH, sizeof(unsigned short int), COL_3_WIDTH, 0, COL_4_WIDTH, USHRT_MAX);
+			printf("| %*s| %*d| %*d| %*u|\n", COL_1_WIDTH, "unsigned short int", COL_2_WIDTH, sizeof(unsigned short int), COL_3_WIDTH, 0, COL_4_WIDTH, USHRT_MAX);
 			break;
 		case 7: // Unsigned int
-			printf("| %*s| %*ld| %*d| %*u|\n", COL_1_WIDTH, "unsigned int", COL_2_WIDTH, sizeof(unsigned int), COL_3_WIDTH, 0, COL_4_WIDTH, UINT_MAX);
+			printf("| %*s| %*d| %*d| %*u|\n", COL_1_WIDTH, "unsigned int", COL_2_WIDTH, sizeof(unsigned int), COL_3_WIDTH, 0, COL_4_WIDTH, UINT_MAX);
 			break;
 		case 8: // Unsigned long int
-			printf("| %*s| %*ld| %*d| %*lu|\n", COL_1_WIDTH, "unsigned long int", COL_2_WIDTH, sizeof(unsigned long int), COL_3_WIDTH, 0, COL_4_WIDTH, ULONG_MAX);
+			printf("| %*s| %*d| %*d| %*lu|\n", COL_1_WIDTH, "unsigned long int", COL_2_WIDTH, sizeof(unsigned long int), COL_3_WIDTH, 0, COL_4_WIDTH, ULONG_MAX);
 			break;
 		case 9: // Unsigned long long int
-			printf("| %*s| %*ld| %*d| %*llu|\n", COL_1_WIDTH, "unsigned long long int", COL_2_WIDTH, sizeof(unsigned long long int), COL_3_WIDTH, 0, COL_4_WIDTH, ULLONG_MAX);
+			printf("| %*s| %*d| %*d| %*llu|\n", COL_1_WIDTH, "unsigned long long int", COL_2_WIDTH, sizeof(unsigned long long int), COL_3_WIDTH, 0, COL_4_WIDTH, ULLONG_MAX);
 			break;
 		case 10: // Float
-			printf("| %*s| %*ld| %*e| %*e|\n", COL_1_WIDTH, "float", COL_2_WIDTH, sizeof(float), COL_3_WIDTH, FLT_MIN, COL_4_WIDTH, FLT_MAX);
+			printf("| %*s| %*d| %*e| %*e|\n", COL_1_WIDTH, "float", COL_2_WIDTH, sizeof(float), COL_3_WIDTH, FLT_MIN, COL_4_WIDTH, FLT_MAX);
 			break;
 		case 11: // Double
-			printf("| %*s| %*ld| %*e| %*e|\n", COL_1_WIDTH, "double", COL_2_WIDTH, sizeof(double), COL_3_WIDTH, DBL_MIN, COL_4_WIDTH, DBL_MAX);
+			printf("| %*s| %*d| %*e| %*e|\n", COL_1_WIDTH, "double", COL_2_WIDTH, sizeof(double), COL_3_WIDTH, DBL_MIN, COL_4_WIDTH, DBL_MAX);
 			break;
 		default:
 			return;
