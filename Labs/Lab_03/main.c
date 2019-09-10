@@ -3,6 +3,7 @@
 
 #define SW1 P1IN & BIT0
 #define SW2 P1IN & BIT1
+#define EVER ;;
 
 /*
 --------------------------------------------------------
@@ -35,18 +36,26 @@ int main(void)
     P2OUT |= BIT2 + BIT1;
 
     // Infinite loop
-    for(;;) {
-
-        // If Switch 1 is pressed
-        if ((SW1) == 0) {
-
-            // 20 ms debounce
-            int i;
-            for(i=0;i<20000;i++);
-
-            // Toggle LED using XOR
-            P2OUT ^= BIT2;
-        }
+    for(EVER) {
+		
+		unsigned int i;
+		switch (P1IN & (BIT1 + BIT0)) {
+			case BIT0:
+				for(i=0;i<10000;i++); // 100ms delay --> 5 Hz
+				P2OUT ^= BIT2;
+				break;
+			case BIT1:
+				for(i=0;i<25000;i++); // 250ms delay --> 2 Hz
+				P2OUT ^= BIT2;
+				break;
+			case (BIT1 + BIT0):
+				for(i=0;i<50000;i++); // 500ms delay --> 1 Hz
+				P2OUT ^= (BIT2 + BIT1);
+				break;
+			default:
+				P2OUT |= (BIT2 + BIT1); // LED1 and LED2 are on when no switch is pressed
+		}
+		
     }
 
     return 0;
