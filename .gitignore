@@ -69,3 +69,4 @@ desktop.ini
 /Course Documentation/
 /cpe325-lab-demos-master/
 *.zip
+/Labs/*/Documentation/*.docx
