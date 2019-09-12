@@ -10,19 +10,20 @@
 /*
 --------------------------------------------------------
 *
-File:
+File: Lab_03/main.c
 *
-Description:
+Description: Toggle LEDs based on state of two 
+             switches
 *
-Input:
+Input: MSP430 Experimenter Board SW1 and SW2
 *
-Output:
+Output: MSP430 Experimenter Board LED1 and LED2
 *
 Author: Austin Bumbalough
 *
 Lab Section: 8
 *
-Date:
+Date: 9/10/2019
 *
 --------------------------------------------------------
 */
