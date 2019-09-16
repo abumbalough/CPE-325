@@ -59,14 +59,8 @@ Mkfile.old
 dkms.conf
 
 # End of https://www.gitignore.io/api/c,assembler
-/.metadata/
-desktop.ini
 
-/.jxbrowser-data
-/.metadata
-/RemoteSystemsTempFiles
-/dvt
+desktop.ini
 /Course Documentation/
 /cpe325-lab-demos-master/
 *.zip
-/Labs/*/Documentation/*.docx

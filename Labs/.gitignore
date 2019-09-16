@@ -1,1 +1,5 @@
-/.metadata/
+.metadata/
+.jxbroser-data/
+dvt/
+RemoteSystemsTempFiles/
+*/Documentation/*.docx
