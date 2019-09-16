@@ -2,8 +2,7 @@ Austin Bumbalough
 CPE 325-08  
 Lab 01  
 08/27/2019  
-# Lab 01 Solution 
---- 
+# Lab 01 Solution  
 ## Part 1 Solution  
 ### Flow Diagram
 ![Part 1 Flow Diagram](Documentation/Flow_Diagram_01.png)  
