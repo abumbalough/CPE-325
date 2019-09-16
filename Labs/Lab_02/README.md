@@ -5,15 +5,15 @@ Lab 02
 # Lab 02 Solution  
 ## Console Output 
 ### Part 01
-![Part 1 Console Output](Documentation/part_01.png)  
+![Part 1 Console Output](Documentation/part_01.PNG)  
 ### Part 02
-![Part 2 Console Output](Documentation/part_02.png) 
+![Part 2 Console Output](Documentation/part_02.PNG) 
 ### Bonus
-![Bonus Console Output](Documentation/bonus.png)
+![Bonus Console Output](Documentation/bonus.PNG)
   
 ## Flow Diagram  
 ### Bonus
-![Bonus Flow Diagram](Documentation/flow_chart.png)  
+![Bonus Flow Diagram](Documentation/flow_chart.PNG)  
 ## Source Code  
 
 ```C
