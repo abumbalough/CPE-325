@@ -7,6 +7,12 @@ Lab 03
 There are 10 clock cycles per for-loop iteration, 
 and the processor frequency is 1 MHz (1 million clock cycles per second). 
 This means that there are ![eqn1](http://www.sciweavers.org/tex2img.php?eq=%5Cfrac%7B10%5E%7B6%7D%5Cfrac%7Bclk.%5C%20cycles%7D%7Bsecond%7D%7D%7B10%5Cfrac%7Bclk.%5C%20cycles%7D%7Bloop%5C%20iteration%7D%7D%3D10%5E%7B5%7D%20%5Cfrac%7Bloop%5C%20iterations%7D%7Bsecond%7D%3D10%5E%7B2%7D%5Cfrac%7Bloop%5C%20iterations%7D%7Bmillisecond%7D&bc=White&fc=Black&im=png&fs=12&ff=arev&edit=0)
+so the number of iterations in _s_ milliseconds is _d(s) = 10<sup>2</sup>s_.  
+An on/off period of 5 Hz means the led must toggle at 10 Hz. 10 Hz means the delay should be 100 ms.  
+Thus, _d(100) = 10<sup>2</sup>(100)=10,000 loop iterations_.  
+Similarly, a 2 Hz blinking frequency means the LED must toggle at 4 Hz (250 ms), and a 1 Hz blinking
+frequency means the LED must toggle at 2 Hz (500 ms).  
+_d(250) = 10<sup>2</sup>(250) = 25,000_ loop iterations and _d(500) = 10<sup>2</sup>(500) = 50,000_ loop iterations.  
 
 ## Source Code  
 
