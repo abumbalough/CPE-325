@@ -48,16 +48,15 @@ RESET:       mov.w   #__STACK_END,SP         ; Initialize stackpointer
 ; Main loop here
 ;-------------------------------------------------------------------------------
 
-			mov.w #testString, R4 ; Move string start address to R4
-getNext:	mov.b @R4, R5
-			cmp.b #0, R5
+			mov.w #testString, R4 	; Move string start address to R4
+getNext:	mov.b @R4, R5 			; Move first character into R5
+			cmp.b #0, R5 			; Check for string end
 			jeq stringEnd
-			cmp #97, R5 ; ASCII value of a is 97
+			cmp #97, R5 			; Check if R5 contains a lower case character
 			jl incString
-			cmp #123, R5 ; ASCII value of z is 122
+			cmp #123, R5
 			jge incString
-			sub.b #32, 0(R4)
-			;mov.b R5, 0(R4)
+			sub.b #32, 0(R4) 		; Subtract 32 to convert lower case to upper case
 			jmp incString
 incString:	inc.w R4
 			jmp getNext
