@@ -30,7 +30,7 @@
 ; Program variables stored in RAM (.data)
 ;-------------------------------------------------------------------------------
 
-evalString:	.cstring "1+2+13"
+evalString:	.cstring "1+2+4-6"
 											
 ;-------------------------------------------------------------------------------
             .text                           ; Assemble into program memory.
@@ -48,16 +48,30 @@ RESET:       mov.w   #__STACK_END,SP         ; Initialize stackpointer
 ; Main loop here
 ;-------------------------------------------------------------------------------
 
-			clr.w SR
-			clr.w R7
-			bis.b #0xFF, P2DIR
-			mov.b #'+', R6
+			clr.w SR 				; Clear status register
+			clr.w R7 				; Clear result register R7
+			clr.w R8 				; Clear operator flag register R8
+			bis.b #0xFF, P2DIR 		; Set port 2 to output
+			mov.w #evalString, R4 	; Move string start address to R4
+			jmp getOperand
 
-getNext:	mov.b @R4+, R5 ; Move next operand to R7
-			cmp.b #0, R5 ; Check for string end
+getOperator:mov.b @R4+, R6 			; Get next Operator
+			cmp.b #0, R6 			; Check for string end
 			jeq printResult
-			jmp charToDec
-charToDec:	cmp.b #'0', R5
+			cmp.b #'+', R6 			; Check if operator is +
+			jeq setAdd
+			cmp.b #'-', R6 			; Check if operator is -
+			jeq setSub
+convOp:		cmp.b #'+', R6 			; Compare operator and set operation flag
+			jeq setAdd
+			cmp.b #'-', R6
+			jeq setSub
+setAdd:		mov.b #0, R8 			; Set operation flag to 0
+			jmp getOperand
+setSub:		mov.b #1, R8 			; Set operation flag to 1
+			jmp getOperand
+getOperand:	mov.b @R4+, R5 			; Move next operand to R5
+charToDec:	cmp.b #'0', R5 			; Convert operand from ascii to decimal
 			jeq ascii0
 			cmp.b #'1', R5
 			jeq ascii1
@@ -78,41 +92,34 @@ charToDec:	cmp.b #'0', R5
 			cmp.b #'9', R5
 			jeq ascii9
 ascii0:		mov.b #0, R5
-			jmp getOp
+			jmp evaluate
 ascii1:		mov.b #1, R5
-			jmp getOp
+			jmp evaluate
 ascii2:		mov.b #2, R5
-			jmp getOp
+			jmp evaluate
 ascii3:		mov.b #3, R5
-			jmp getOp
+			jmp evaluate
 ascii4:		mov.b #4, R5
-			jmp getOp
+			jmp evaluate
 ascii5:		mov.b #5, R5
-			jmp getOp
+			jmp evaluate
 ascii6:		mov.b #6, R5
-			jmp getOp
+			jmp evaluate
 ascii7:		mov.b #7, R5
-			jmp getOp
+			jmp evaluate
 ascii8:		mov.b #8, R5
-			jmp getOp
+			jmp evaluate
 ascii9:		mov.b #9, R5
-			jmp getOp
-eval:		cmp.b #0, R8
-			jeq setAdd
-			cmp.b #1, R8
-			jeq setSub
-getOp:		mov.b @R4+, R6 ; Get next Operator
-			cmp.b #'+', R6 ; Check if operator is +
-			jeq addOps
-			cmp.b #'-', R6 ; Check if operator is -
-			jeq subOps
-addOps:		add.b R5, R7 ; Add R7 to R5
-			jmp getNext
-subOps:		sub.b R5, R7 ; Subtract R7 from R5
-			jmp getNext
-setAdd:		mov.b #0, R8
-setSub:		mov.b #1, R8
-printResult:mov.b R5, P2OUT
+			jmp evaluate
+evaluate:	cmp #0, R8 				; Check operation flag and perform operation
+			jeq regAdd
+			cmp #1, R8
+			jeq regSub
+regAdd:		add.b R5, R7 			; Add R5 to R7
+			jmp getOperator
+regSub:		sub.b R5, R7 			; Subtract R5 from R7
+			jmp getOperator
+printResult:mov.b R7, P2OUT 		; Display R7 on Port 2
 			jmp $
 
 ;-------------------------------------------------------------------------------
