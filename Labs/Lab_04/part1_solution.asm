@@ -22,7 +22,7 @@
             .cdecls C,LIST,"msp430.h"       ; Include device header file
             .align 2						; Align to words
             
-testStr:	.cstring "Do 42+53/76%8=2*8-32+71 & you can sleep." ; Program input string
+testStr:	.cstring "Do 42+53/76%8=2*8-32+71--! & you can sleep." ; Program input string
 
 opChars:	.cstring "%&*+-/<>=^~"          ; Allocates 11 bytes for math operator characters
 			.data

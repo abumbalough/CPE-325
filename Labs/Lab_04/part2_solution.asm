@@ -30,7 +30,7 @@
 ; Program variables stored in RAM (.data)
 ;-------------------------------------------------------------------------------
 
-evalString:	.cstring "1+2+4-6"
+evalString:	.cstring "1+2-4"
 											
 ;-------------------------------------------------------------------------------
             .text                           ; Assemble into program memory.
