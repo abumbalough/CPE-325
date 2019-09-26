@@ -26,7 +26,7 @@ testStr:	.cstring "Do 42+53/76%8=2*8-32+71 & you can sleep." ; Program input str
 
 opChars:	.cstring "%&*+-/<>=^~"          ; Allocates 11 bytes for math operator characters
 			.data
-charCount:	.byte 0
+charCount:	.word 0
 
 ;-------------------------------------------------------------------------------
             .def    RESET                   ; Export program entry-point to
@@ -49,6 +49,7 @@ RESET:       mov.w   #__STACK_END,SP         ; Initialize stackpointer
 
             clr.w SR 				; Clear status register
             clr.w R8 				; Clear R8 to store the matched character count
+            mov.w #charCount, R10	; Move memory address of counter variable to R10
 
             mov.w #testStr, R4 		; Move address of first test string character into R4
 getNext:    mov.w #opChars, R5 		; Move address of first operator character into R5
@@ -62,8 +63,7 @@ testOp:		mov.b @R5+, R7 			; Move next operator charcter into R7 and increment R
 			jne testOp 				; If not match, get next operator character and repeat
 			inc.w charCount			; If the characters match, increment the counter register and
 			jmp getNext 			; Get next operator charcter and repeat
-stringEnd:	mov.w #charCount, R10	; Move memory address of counter variable to R10
-			jmp $ 					; End of program, unconditional jump to current location
+stringEnd:	jmp $ 					; End of program, unconditional jump to current location
 
 
 

@@ -52,6 +52,7 @@ RESET:       mov.w   #__STACK_END,SP         ; Initialize stackpointer
 			clr.w R7 				; Clear result register R7
 			clr.w R8 				; Clear operator flag register R8
 			bis.b #0xFF, P2DIR 		; Set port 2 to output
+			mov.w #0, P2OUT
 			mov.w #evalString, R4 	; Move string start address to R4
 			jmp getOperand
 
