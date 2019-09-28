@@ -25,17 +25,17 @@
             .def    RESET                   ; Export program entry-point to
                                             ; make it known to linker.
 ;-------------------------------------------------------------------------------
-            .text                           ; Assemble into program memory.
-            .retain                         ; Override ELF conditional linking
-                                            ; and retain current section.
-            .retainrefs                     ; And retain any sections that have
-                                            ; references to current section.
+            .text                           	; Assemble into program memory.
+            .retain                         	; Override ELF conditional linking
+												; and retain current section.
+            .retainrefs                     	; And retain any sections that have
+												; references to current section.
 
-arr1:		.int 1, 2, 3, 4, 5, 6, 7, 8		; Declare input array 1
-arr2:		.int 3, 4, 5, 6, 7, 8, 9, 10	; Declare input array 2
+arr1:		.int 0, 1, 2, 3, 4, 5, 6, 7, 8, 9	; Declare input array 1
+arr2:		.int 9, 8, 7, 6, 5, 4, 3, 2, 1, 0	; Declare input array 2
 
-			.bss arrOut_sw, 16, 2			; Allocate unitialized space for output arrays
-			.bss arrOut_hw, 16, 2			;
+			.bss arrOut_sw, 16, 2				; Allocate unitialized space for output arrays
+			.bss arrOut_hw, 16, 2				;
 
 ;-------------------------------------------------------------------------------
 RESET       mov.w   #__STACK_END,SP         ; Initialize stackpointer
@@ -62,7 +62,7 @@ StopWDT     mov.w   #WDTPW|WDTHOLD,&WDTCTL  ; Stop watchdog timer
 			push R6
 			push R8
 			call hwMult
-			add.w #, SP
+			add.w #8, SP			; Collapse stack after subroutine execution
 			
 progEnd:	jmp $ 					; End of program
 ;-------------------------------------------------------------------------------
@@ -77,12 +77,12 @@ swMult:		push R9
 			mov.w 14(SP), R4 	; Array length
 			mov.w 12(SP), R5	; arr1 address
 			mov.w 10(SP), R6	; arr2 address
-			mov.w 8(SP), R7	; arrOut address
-getNext:	mov.b @R5, R9 ; Get next operands
-			mov.b @R6, R10
-			sxt R5 ; Sign extend the operands
+			mov.w 8(SP), R7		; arrOut address
+getNext:	mov.b @R5+, R9 		; Get next operands
+			mov.b @R6+, R10
+			sxt R5 				; Sign extend the operands
 			sxt R6
-			mov.b R10, R11 ; Use R11 as loop counter
+			mov.b R10, R11 		; Use R11 as loop counter
 mul_loop:	bit.w BIT0, R10
 			jz shift
 			add.w R9, R12
@@ -96,12 +96,10 @@ shift:		rla.w R9
 			add.w #1, R9
 			add.w R9, R12
 mul_end:	mov.w R12, 0(R7)
-			inc.w R5 ; Point arr1 to the next element
-			inc.w R6 ; Point arr2 to the next element
-			inc.w R7 ; Point arrOut to the next element
-			dec.w R4 ; Decrement loop counter
+			add.w #2, R7		; Point arrOut to the next element
+			dec.w R4 			; Decrement loop counter
 			jnz getNext
-			pop R12
+			pop R12				; Collapse stack and return from subroutine
 			pop R11
 			pop R10
 			pop R9
@@ -109,6 +107,22 @@ mul_end:	mov.w R12, 0(R7)
 ;-------------------------------------------------------------------------------
 ; HW_Multiply Subroutine
 ;-------------------------------------------------------------------------------
+hwMult:		push R9
+			push R10
+			mov.w 10(SP), R4 	; Array length
+			mov.w 8(SP), R5 	; arr1 address
+			mov.w 6(SP), R6 	; arr2 address
+			mov.w 4(SP), R8 	; arrOut address
+loop:		mov.b @R5+, R9
+			mov.b @R6+, R10
+			mov.b R9, &MPYS 	; Load first operand - Use signed multiply mode
+			mov.b R10, &OP2 	; Load second operand
+			mov.w &RESLO, 0(R8) ; Store result in arrOut
+			dec.w R4
+			jnz loop
+			pop R10 			; Collapse stack and return from subroutine
+			pop R9
+			ret
 ;-------------------------------------------------------------------------------
 ; Stack Pointer definition
 ;-------------------------------------------------------------------------------
