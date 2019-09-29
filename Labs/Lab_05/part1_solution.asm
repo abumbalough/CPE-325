@@ -5,7 +5,8 @@
 ; File: Lab_05/part1_solution.asm
 ; *
 ; Description: Perform element-wise multiplication of two one-dimensional
-;				arrays and store the result in a third array
+;				arrays and store the result in a third array. Parameters
+;				and results passed using stack.
 ; *
 ; Input: Data stored in memory
 ; *
@@ -82,7 +83,7 @@ getNext:	mov.b @R5+, R9 		; Get next operands
 			mov.b @R6+, R10
 			sxt R5 				; Sign extend the operands
 			sxt R6
-			mov.b R10, R11 		; Use R11 as loop counter
+			mov.b #8, R11 		; Use R11 as loop counter
 mul_loop:	bit.w BIT0, R10
 			jz shift
 			add.w R9, R12
@@ -134,4 +135,9 @@ loop:		mov.b @R5+, R9
 ;-------------------------------------------------------------------------------
             .sect   ".reset"                ; MSP430 RESET Vector
             .short  RESET
-            
+;----------------------------------------------------------------;
+;	 _ )               |            |                     |      ;
+;	 _ \  |  |   ` \    _ \   _` |  |   _ \  |  |   _` |    \    ;
+;	___/ \_,_| _|_|_| _.__/ \__,_| _| \___/ \_,_| \__, | _| _|   ;
+;	                                              ____/          ;
+;----------------------------------------------------------------;
