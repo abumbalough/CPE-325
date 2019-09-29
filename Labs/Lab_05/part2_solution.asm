@@ -34,8 +34,8 @@
 			.bss power_sw, 20, 2			; Allocate unitialized space for outputs
 			.bss power_hw, 20, 2			;
 ;-------------------------------------------------------------------------------
-RESET       mov.w   #__STACK_END,SP         ; Initialize stackpointer
-StopWDT     mov.w   #WDTPW|WDTHOLD,&WDTCTL  ; Stop watchdog timer
+RESET:		mov.w   #__STACK_END,SP         ; Initialize stackpointer
+			mov.w   #WDTPW|WDTHOLD,&WDTCTL  ; Stop watchdog timer
 ;-------------------------------------------------------------------------------
 ; Main loop here
 ;-------------------------------------------------------------------------------

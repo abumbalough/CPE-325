@@ -39,8 +39,8 @@ arr2:		.int 9, 8, 7, 6, 5, 4, 3, 2, 1, 0	; Declare input array 2
 			.bss arrOut_hw, 16, 2				;
 
 ;-------------------------------------------------------------------------------
-RESET       mov.w   #__STACK_END,SP         ; Initialize stackpointer
-StopWDT     mov.w   #WDTPW|WDTHOLD,&WDTCTL  ; Stop watchdog timer
+RESET:		mov.w   #__STACK_END,SP         ; Initialize stackpointer
+			mov.w   #WDTPW|WDTHOLD,&WDTCTL  ; Stop watchdog timer
 ;-------------------------------------------------------------------------------
 ; Main loop here
 ;-------------------------------------------------------------------------------
