@@ -44,22 +44,23 @@ RESET:		mov.w   #__STACK_END,SP         ; Initialize stackpointer
 			mov.w #5, R4			; Power
 			mov.w #7, R5			; Base low word
 			mov.w #0, R6 			; Base high word
-			add.w #20, R14	
+			add.w #16, R14
+			add.w #20, R15
 main_loop:	push R4					; Pass exponent on stack
 			push R5					; Pass base on stack
 			push R6					; -
 			push R7					; Pass space for return value on stack
 			push R8					; -
-			call power_sp			;
+			call #power_sp			;
 			pop R8					; Pop return value from stack
 			pop R7					; -
 			add.w #6, SP			; Collapse stack after subroutine return
-			mov.w R7, 0(R14)		; Store result in memory
-			mov.w R8, 2(R14)		; -	
-			add.w #-4, R14			; Decrement result pointer
-;			mov.w R7, 0(R15)		; Store result in memory
-;			mov.w R8, 2(R15)		; -
-;			add.w #-4, R15			; Decrement result pointer
+;			mov.w R7, 0(R14)		; Store result in memory
+;			mov.w R8, 2(R14)		; -
+;			add.w #-4, R14			; Decrement result pointer
+			mov.w R7, 0(R15)		; Store result in memory
+			mov.w R8, 2(R15)		; -
+			add.w #-4, R15			; Decrement result pointer
 			dec.w R4				; Decrement exponent
 			jnz main_loop			;
 loop_end:	jmp $					; End of program
@@ -80,14 +81,14 @@ power_loop:	push R5				; Pass OP1 on stack
 			push R6				; -
 			push R7				; Pass OP2 on stack
 			push R8				; -
-			call swMult			;
-			pop R8				; Pop return value from stack
-			pop R7				; -
-			add.w #4, SP		; Collapse stack after subroutine return
-;			call hwMult			;
+;			call #swMult			;
 ;			pop R8				; Pop return value from stack
 ;			pop R7				; -
 ;			add.w #4, SP		; Collapse stack after subroutine return
+			call #hwMult		;
+			pop R8				; Pop return value from stack
+			pop R7				; -
+			add.w #4, SP		; Collapse stack after subroutine return
 			dec.w R4			; Decrement loop counter
 			jnz power_loop		;
 power_end:	mov.w R7, 14(SP)	; Return result on stack
@@ -108,12 +109,14 @@ swMult:		push R4				; Save program state
 			push R8				;
 			push R9				;
 			push R10			;
+			clr.w R9
+			clr.w R10
 			mov.w #16, R4		; 
 			mov.w 22(SP), R5	; Retrieve OP1 LB from stack
 			mov.w 20(SP), R6	; Retrieve OP1 UB
 			mov.w 18(SP), R7	; Retrieve OP2 LB
 			mov.w 16(SP), R8	; Retrieve OP2 UB
-mul_loop:	bit.w BIT0, R7		; Test R7 bit 0
+mul_loop:	bit.w #1, R7		; Test R7 bit 0
 			jz shift			;
 			add.w R5, R9		; 16-bit add
 			addc.w R6, R10		; -
@@ -123,7 +126,7 @@ shift:		rla.w R5			; 16-bit left shift
 			rrc.w R8			; -
 			dec.w R4			;
 			jnz mul_loop		;
-			bit.w BIT0, R7		; Test R7 bit 0
+			bit.w #1, R7		; Test R7 bit 0
 			jz mul_end			;
 			inv.w R5			; 16-bit 2's complement
 			inv.w R6			; -
@@ -149,6 +152,17 @@ hwMult:		mov.w 8(SP), &MPYS	;
 			mov.w &RESLO, 4(SP)	;
 			mov.w &RESHI, 2(SP)	;
 			ret
+;-------------------------------------------------------------------------------
+; Stack Pointer definition
+;-------------------------------------------------------------------------------
+            .global __STACK_END
+            .sect   .stack
+
+;-------------------------------------------------------------------------------
+; Interrupt Vectors
+;-------------------------------------------------------------------------------
+            .sect   ".reset"                ; MSP430 RESET Vector
+            .short  RESET
 ;----------------------------------------------------------------;
 ;	 _ )               |            |                     |      ;
 ;	 _ \  |  |   ` \    _ \   _` |  |   _ \  |  |   _` |    \    ;

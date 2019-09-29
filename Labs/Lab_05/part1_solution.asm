@@ -35,8 +35,8 @@
 arr1:		.int 0, 1, 2, 3, 4, 5, 6, 7, 8, 9	; Declare input array 1
 arr2:		.int 9, 8, 7, 6, 5, 4, 3, 2, 1, 0	; Declare input array 2
 
-			.bss arrOut_sw, 16, 2				; Allocate unitialized space for output arrays
-			.bss arrOut_hw, 16, 2				;
+			.bss arrOut_sw, 20, 2				; Allocate unitialized space for output arrays
+			.bss arrOut_hw, 20, 2				;
 
 ;-------------------------------------------------------------------------------
 RESET:		mov.w   #__STACK_END,SP         ; Initialize stackpointer
@@ -44,7 +44,7 @@ RESET:		mov.w   #__STACK_END,SP         ; Initialize stackpointer
 ;-------------------------------------------------------------------------------
 ; Main loop here
 ;-------------------------------------------------------------------------------
-			mov.b #8, R4 			; Number of array elements
+			mov.b #10, R4 			; Number of array elements
 			mov.w #arr1, R5 		; Starting address of input array 1
 			mov.w #arr2, R6 		; Starting address of input array 2
 			mov.w #arrOut_sw, R7	; Starting address of output arrays
@@ -53,45 +53,45 @@ RESET:		mov.w   #__STACK_END,SP         ; Initialize stackpointer
 			push R5 ;
 			push R6 ;
 			push R7 ;
-			call swMult
+			call #SW_product
 			add.w #8, SP			; Collapse stack after subroutine execution
-			mov.b #8, R4
-			mov.b #arr1, R5
-			mov.b #arr2, R6
+			mov.b #10, R4
+			mov.w #arr1, R5
+			mov.w #arr2, R6
 			push R4
 			push R5
 			push R6
 			push R8
-			call hwMult
+			call #HW_product
 			add.w #8, SP			; Collapse stack after subroutine execution
 			
 progEnd:	jmp $ 					; End of program
 ;-------------------------------------------------------------------------------
 ; SW_Multiply Subroutine - Only supports up to 8-bit multiplication
 ;-------------------------------------------------------------------------------
-swMult:		push R9
+SW_product:	push R9
 			push R10
 			push R11
 			push R12
-			clr.w R12
 								; Retrieve parameters from stack
-			mov.w 14(SP), R4 	; Array length
-			mov.w 12(SP), R5	; arr1 address
-			mov.w 10(SP), R6	; arr2 address
-			mov.w 8(SP), R7		; arrOut address
-getNext:	mov.b @R5+, R9 		; Get next operands
-			mov.b @R6+, R10
-			sxt R5 				; Sign extend the operands
-			sxt R6
+			mov.w 16(SP), R4 	; Array length
+			mov.w 14(SP), R5	; arr1 address
+			mov.w 12(SP), R6	; arr2 address
+			mov.w 10(SP), R7		; arrOut address
+getNext:	clr.w R12
+			mov.w @R5+, R9 		; Get next operands
+			mov.w @R6+, R10
+			sxt R9 				; Sign extend the operands
+			sxt R10
 			mov.b #8, R11 		; Use R11 as loop counter
-mul_loop:	bit.w BIT0, R10
+mul_loop:	bit.w #1, R10
 			jz shift
 			add.w R9, R12
 shift:		rla.w R9
 			rra.w R10
 			dec.w R11
 			jnz mul_loop
-			bit.w BIT0, R10
+			bit.w #1, R10
 			jz mul_end
 			inv.w R9
 			add.w #1, R9
@@ -108,17 +108,18 @@ mul_end:	mov.w R12, 0(R7)
 ;-------------------------------------------------------------------------------
 ; HW_Multiply Subroutine
 ;-------------------------------------------------------------------------------
-hwMult:		push R9
+HW_product:	push R9
 			push R10
-			mov.w 10(SP), R4 	; Array length
-			mov.w 8(SP), R5 	; arr1 address
-			mov.w 6(SP), R6 	; arr2 address
-			mov.w 4(SP), R8 	; arrOut address
-loop:		mov.b @R5+, R9
-			mov.b @R6+, R10
+			mov.w 12(SP), R4 	; Array length
+			mov.w 10(SP), R5 	; arr1 address
+			mov.w 8(SP), R6 	; arr2 address
+			mov.w 6(SP), R8 	; arrOut address
+loop:		mov.w @R5+, R9
+			mov.w @R6+, R10
 			mov.b R9, &MPYS 	; Load first operand - Use signed multiply mode
 			mov.b R10, &OP2 	; Load second operand
 			mov.w &RESLO, 0(R8) ; Store result in arrOut
+			add.w #2, R8
 			dec.w R4
 			jnz loop
 			pop R10 			; Collapse stack and return from subroutine
