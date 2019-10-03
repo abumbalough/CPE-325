@@ -26,17 +26,17 @@
             .def    RESET                   ; Export program entry-point to
                                             ; make it known to linker.
 ;-------------------------------------------------------------------------------
-            .text                           	; Assemble into program memory.
-            .retain                         	; Override ELF conditional linking
-												; and retain current section.
-            .retainrefs                     	; And retain any sections that have
-												; references to current section.
+            .text                           		; Assemble into program memory.
+            .retain                         		; Override ELF conditional linking
+													; and retain current section.
+            .retainrefs                     		; And retain any sections that have
+													; references to current section.
 
-arr1:		.int 0, 1, 2, 3, 4, 5, 6, 7, 8, 9	; Declare input array 1
-arr2:		.int 9, 8, 7, 6, 5, 4, 3, 2, 1, 0	; Declare input array 2
+arr1:		.int 0, -1, 2, 3, -4, -5, 6, -7, 8, 9	; Declare input array 1
+arr2:		.int -9, 8, 7, -6, 5, 4, 3, -2, 1, 0	; Declare input array 2
 
-			.bss arrOut_sw, 20, 2				; Allocate unitialized space for output arrays
-			.bss arrOut_hw, 20, 2				;
+			.bss arrOut_sw, 20, 2					; Allocate unitialized space for output arrays
+			.bss arrOut_hw, 20, 2					;
 
 ;-------------------------------------------------------------------------------
 RESET:		mov.w   #__STACK_END,SP         ; Initialize stackpointer
