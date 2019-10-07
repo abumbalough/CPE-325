@@ -44,10 +44,11 @@ StopWDT:	mov.w   #WDTPW|WDTHOLD,&WDTCTL  ; Stop watchdog timer
 Setup:		bic.b #0x03, &P1DIR 		; Configure P1.0 and P1.1 as inputs
 			bis.b #0x06, &P2DIR 		; Configure P2.1 and P2.2 as ouputs
 			bic.b #0xFF, &P2OUT			; Initialize LEDs to off
-			bis.w #GIE, &SR 			; Enable global interrupts
+			bis.w #GIE, SR 				; Enable global interrupts
 			bis.b #0x03, &P1IES 		; Trigger interrupts on falling edge since SW1 and SW2 have 100K pullup resistor
 			bic.b #0x03, &P1IFG 		; Clear any pending interrupts
 			bis.b #0x03, &P1IE 			; Enable interrupts on P1.0 and P1.1
+			jmp $
 ;-------------------------------------------------------------------------------
 ; Port 1 Interrupt Service Routine
 ;-------------------------------------------------------------------------------
@@ -57,10 +58,9 @@ P1_ISR:		push R15
 			jnz S1						;
 			bit.b #0x02, &P1IFG			; Check for SW2 interrupt
 			jnz S2						;
-			bic.b #0xFF, &P1IFG
-			ISR_exit
-S1:			bic.b #0x01, &P1IFG			; Clear interrupt flag for SW1
-			bit.b #0x01, &P1IN			; Check if SW1 is pressed
+			bic.b #0xFF, &P1IFG			; Clear P1IFG
+			jmp ISR_exit
+S1:			bit.b #0x01, &P1IN			; Check if SW1 is pressed
 			jnz ISR_exit				;
 			mov.w #2000, R15			; (20 * 100) * 10 cc per loop
 DbncSW1:	dec.w R15					; 20 ms debounce
@@ -74,14 +74,14 @@ DbncSW1:	dec.w R15					; 20 ms debounce
 			jnz DbncSW1					;
 			bit.b #0x01, &P1IN			; Check if SW1 is still pressed
 			jnz ISR_exit				;
-			call SW1					;
+			call #SW1					;
 			xor.b #0x02, &P2OUT			;
+			bic.b #0x01, &P1IFG			; Clear interrupt flag for SW1
 			jmp ISR_exit				;
-S2:			bic.b #0x02, &P1IFG			;
-			bit.b #0x02, &P1IN			; Check if SW2 is pressed
+S2:			bit.b #0x02, &P1IN			; Check if SW2 is pressed
 			jnz ISR_exit				;
 			mov.w #2000, R15			; 
-DbncSW1:	dec.w R15					;
+DbncSW2:	dec.w R15					;
 			nop							;
 			nop							;
 			nop							;
@@ -89,16 +89,17 @@ DbncSW1:	dec.w R15					;
 			nop							;
 			nop							;
 			nop							;
-			jnz DbncSW1					;
+			jnz DbncSW2					;
 			bit.b #0x02, &P1IN			; Check if SW2 is still pressed
 			jnz ISR_exit				;
-			xor.b #0x02, &P2OUT			; Toggle LED 2                           
+			xor.b #0x02, &P2OUT			; Toggle LED 2
+			bic.b #0x02, &P1IFG			;
 ISR_exit:	pop R15						;
 			reti						;
 ;-------------------------------------------------------------------------------
 ; Switch 1 Subroutine
 ;-------------------------------------------------------------------------------
-			push R14					;
+SW1:		push R14					;
 			push R15					;
 			mov.w #6, R14				; LED 1 toggle counter
 sw1_loop:	mov.w #16667, R15			;
