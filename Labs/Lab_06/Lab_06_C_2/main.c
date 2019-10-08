@@ -46,7 +46,7 @@ int main(void) {
 
 #pragma vector = PORT1_VECTOR
 __interrupt void P1ISR(void) {
-    // _EINT();
+    for (int i=5000;i>0;i--); // Hard to press both buttons at the exact same time
     switch (P1IFG & (BIT1+BIT0)) {
         case (BIT0): // SW1 pressed
                 for (int i=10000;i>0;i--);
@@ -68,7 +68,7 @@ __interrupt void P1ISR(void) {
                 }
                 P1IFG &= ~BIT1; // Clear interrupt flag
                 break;
-        case(BIT1+BIT0):
+        case(BIT1+BIT0): // Both switches pressed
                 for (int i=10000;i>0;i--);
                 if (((SW1) == 0) & ((SW2) == 0)) {
                     P2OUT |= BIT2+BIT1;
