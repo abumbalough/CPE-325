@@ -27,8 +27,6 @@ LED1 - P2.2
 LED2 - P2.1
 --------------------------------------------------------
 */
-int bothSW = 0;
-
 int main(void) {
     // Setup Ports and Registers
     WDTCTL = WDTPW | WDTHOLD;   // stop watchdog timer
