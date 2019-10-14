@@ -1,10 +1,10 @@
 #include <msp430.h> 
 
-#define BRIGHT_1 6554
-#define BRIGHT_2 13107
-#define BRIGHT_3 19661
-#define BRIGHT_4 26214
-#define BRIGHT_5 32767
+#define BRIGHT_1 200
+#define BRIGHT_2 400
+#define BRIGHT_3 600
+#define BRIGHT_4 800
+#define BRIGHT_5 999
 
 #define SW1 (P1IN & BIT0)
 #define SW2 (P1IN & BIT1)
@@ -37,21 +37,22 @@ LED2 - P2.1
 int main(void) {
     // Setup Ports and Registers
     WDTCTL = WDTPW | WDTHOLD;   // stop watchdog timer
-	P1DIR &= ~(BIT1+BIT0); // Set P1.0 and P1.1 to input
-	P2DIR |= BIT2; // Set P2.2 to output
-	P2SEL |= BIT2; // Select special function for P2.2 (TB1 Output)
-	TBCTL = MC_0; // Stop timer B while configuring
-	TBCTL |= TBSSEL_1; // Timer B Clock Source: ACLK
-	TBCCTL1 |= OUTMOD_4; // Set Timer B1 to toggle output mode
-	TBCCR1 = BRIGHT_3; // Set Timer B1 compare value
-	TBCTL |= MC_2; // Start Timer B in continuous mode
-	P1IES |= BIT1+BIT0; // Falling edge triggers interrupt
-	P1IFG &= ~(BIT1+BIT0); // Clear any pending interrupts
-	P1IE |= BIT1+BIT0; // Enable interrupts on P1.0 and P1.1
-	_EINT(); // Set GIE bit in SR
-	LPM3; // Put system in low power mode 3
-	
-	return 0;
+    P1DIR &= ~(BIT1+BIT0); // Set P1.0 and P1.1 to input
+    P2DIR |= BIT2; // Set P2.2 to output
+    P2SEL |= BIT2; // Select special function for P2.2 (TB1 Output)
+    TBCTL = MC_0; // Stop timer B while configuring
+    TBCTL |= TBSSEL_2; // Timer B Clock Source: ACLK
+    TBCCTL1 |= OUTMOD_7; // Set Timer B1 to toggle output mode
+    TBCCR1 = BRIGHT_2; // Set Timer B1 compare value
+    TBCCR0 = 1000;
+    TBCTL |= MC_1; // Start Timer B in continuous mode
+    P1IES |= BIT1+BIT0; // Falling edge triggers interrupt
+    P1IFG &= ~(BIT1+BIT0); // Clear any pending interrupts
+    P1IE |= BIT1+BIT0; // Enable interrupts on P1.0 and P1.1
+    _EINT(); // Set GIE bit in SR
+    LPM0; // Put system in low power mode 3
+
+    return 0;
 }
 
 #pragma vector = PORT1_VECTOR
@@ -59,14 +60,14 @@ __interrupt void P1ISR(void) {
 	static int level = 3;
 	switch (P1IFG & (BIT1+BIT0)) {
 		case BIT0: // SW1 pressed, brightness increases
-			for (int i=5000;i>0;i--);
+			for (int i=10000;i>0;i--);
 			if (SW1 == 0) {
 				if (level < 5) level++;
 			}
 			P1IFG &= ~BIT0; // Clear P1.0 interrupt flag
 			break;
 		case BIT1: // SW2 pressed, brightness decreases
-			for (int i=5000;i>0;i--);
+			for (int i=10000;i>0;i--);
 			if (SW2 == 0) {
 				if (level > 1) level--;
 			}
@@ -75,4 +76,5 @@ __interrupt void P1ISR(void) {
 		case (BIT1+BIT0):
 			break;
 	}
+	TBCCR1 = (200*level) - 1;
 }
