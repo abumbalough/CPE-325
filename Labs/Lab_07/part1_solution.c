@@ -28,6 +28,8 @@ LED2 - P2.1
 --------------------------------------------------------
 */
 
+int brightness[5] = {50, 150, 350, 650, 975};
+
 int main(void) {
     // Setup Ports and Registers
     WDTCTL = WDTPW | WDTHOLD;   // stop watchdog timer
@@ -37,7 +39,7 @@ int main(void) {
     TBCTL = MC_0; // Stop timer B while configuring
     TBCTL |= TBSSEL_2; // Timer B Clock Source: SMCLK
     TBCCTL1 |= OUTMOD_7; // Set Timer B1 to toggle reset/set output mode
-    TBCCR1 = 500; // Set Timer B1 compare value
+    TBCCR1 = brightness[2]; // Set Timer B1 compare value
     TBCCR0 = 1000;
     TBCTL |= MC_1; // Start Timer B in up mode
     P1IES |= BIT1+BIT0; // Falling edge triggers interrupt
@@ -70,5 +72,5 @@ __interrupt void P1ISR(void) {
 		case (BIT1+BIT0):
 			break;
 	}
-	TBCCR1 = (200*level) - 1;
+	TBCCR1 = brightness[level-1];
 }
