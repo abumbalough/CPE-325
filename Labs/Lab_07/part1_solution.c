@@ -1,11 +1,5 @@
 #include <msp430.h> 
 
-#define BRIGHT_1 200
-#define BRIGHT_2 400
-#define BRIGHT_3 600
-#define BRIGHT_4 800
-#define BRIGHT_5 999
-
 #define SW1 (P1IN & BIT0)
 #define SW2 (P1IN & BIT1)
 
@@ -24,7 +18,7 @@ Author: Austin Bumbalough
 *
 Lab Section: 8
 *
-Date: 10/14/2019
+Date: 10/16/2019
 *
 
 SW1 - P1.0
@@ -41,11 +35,11 @@ int main(void) {
     P2DIR |= BIT2; // Set P2.2 to output
     P2SEL |= BIT2; // Select special function for P2.2 (TB1 Output)
     TBCTL = MC_0; // Stop timer B while configuring
-    TBCTL |= TBSSEL_2; // Timer B Clock Source: ACLK
-    TBCCTL1 |= OUTMOD_7; // Set Timer B1 to toggle output mode
-    TBCCR1 = BRIGHT_2; // Set Timer B1 compare value
+    TBCTL |= TBSSEL_2; // Timer B Clock Source: SMCLK
+    TBCCTL1 |= OUTMOD_7; // Set Timer B1 to toggle reset/set output mode
+    TBCCR1 = 500; // Set Timer B1 compare value
     TBCCR0 = 1000;
-    TBCTL |= MC_1; // Start Timer B in continuous mode
+    TBCTL |= MC_1; // Start Timer B in up mode
     P1IES |= BIT1+BIT0; // Falling edge triggers interrupt
     P1IFG &= ~(BIT1+BIT0); // Clear any pending interrupts
     P1IE |= BIT1+BIT0; // Enable interrupts on P1.0 and P1.1
