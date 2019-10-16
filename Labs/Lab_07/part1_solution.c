@@ -53,36 +53,47 @@ int main(void) {
 
 #pragma vector = PORT1_VECTOR
 __interrupt void P1ISR(void) {
-	static unsigned int level = 3;
-	for (int i=10000;i>0;i--); // Delay allows both buttons to be pressed at "same" time
+	static unsigned int level = 2;
+	static unsigned int bothPressed = 0;
+	for (int i=10000;i>0;i--); // 100 ms delay allows both buttons to be pressed at "same" time
 	switch (P1IFG & (BIT1+BIT0)) {
 		case BIT0: // SW1 pressed, brightness increases
 			for (int i=10000;i>0;i--);
 			if (SW1 == 0) {
-				if (level < 5) level++;
+				if (level < 4) level++;
 			}
 			P1IFG &= ~BIT0; // Clear P1.0 interrupt flag
 			break;
 		case BIT1: // SW2 pressed, brightness decreases
 			for (int i=10000;i>0;i--);
 			if (SW2 == 0) {
-				if (level > 1) level--;
+				if (level > 0) level--;
 			}
 			P1IFG &= ~BIT1; // Clear P1.1 interrupt flag
 			break;
 		case (BIT1+BIT0):
-		    for (int i=10000;i>0;i--);
-		    if (SW1+SW2 == 0) {
-		        static long int everyOther = 1;
-		        if (everyOther % 2 == 0)  WDTCTL ^= WDT_ADLY_1000 ^ (WDTPW | WDTHOLD); // Toggle necessary bits in WDTCTL to switch between stop mode and 1000 ms interval mode
-		        everyOther++;
-		    }
+			if !(bothPressed) {
+				for (int i=10000;i>0;i--);
+				if (SW1+SW2 == 0) {
+					bothPressed = 1; // Set flag
+					WDTCTL ^= (WDT_ADLY_1000 ^ (WDTPW | WDTHOLD)); // Toggle necessary bits in WDTCTL to switch between stop mode and 1000 ms interval mode
+					P1IES &= ~(BIT1+BIT0); // Change interrupt trigger to rising edge to catch button release
+				}
+			} else if (bothPressed) {
+				for (int i=10000;i>0;i--);
+				if (SW1+SW2 ==  BIT1+BIT0) {
+					bothPressed = 0; // Clear flag
+					WDTCTL ^= (WDT_ADLY_1000 ^ (WDTPW | WDTHOLD)); // Toggle necessary bits in WDTCTL to switch between stop mode and 1000 ms interval mode
+					P1IES |= BIT1+BIT0; // Restore interrupt trigger to falling edge
+				}
+			}
+			P1IFG &= ~(BIT1+BIT0); // Clear interrupts
 			break;
 	}
-	TBCCR1 = brightness[level-1];
+	TBCCR1 = brightness[level];
 }
 
 #pragma vector=WDT_VECTOR
 __interrupt void wdt_isr(void) {
-    TBCTL^= BIT4;
+    TBCTL^= BIT4; // Toggling bit 4 switches timer B between stop mode and up mode
 }
