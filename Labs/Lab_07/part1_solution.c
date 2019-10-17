@@ -30,7 +30,7 @@ LED2 - P2.1
 
 int brightness[5] = {50, 150, 350, 650, 975};
 
-int main(void) {
+void main(void) {
     // Setup Ports and Registers
     WDTCTL = WDTPW | WDTHOLD;   // stop watchdog timer
     P1DIR &= ~(BIT1+BIT0); // Set P1.0 and P1.1 to input
@@ -45,10 +45,7 @@ int main(void) {
     P1IES |= BIT1+BIT0; // Falling edge triggers interrupt
     P1IFG &= ~(BIT1+BIT0); // Clear any pending interrupts
     P1IE |= BIT1+BIT0; // Enable interrupts on P1.0 and P1.1
-    _EINT(); // Set GIE bit in SR
-    LPM0; // Put system in low power mode 3
-
-    return 0;
+    _BIS_SR(LPM0_bits + GIE); // Put system in low power mode 3
 }
 
 #pragma vector = PORT1_VECTOR
@@ -72,18 +69,18 @@ __interrupt void P1ISR(void) {
 			P1IFG &= ~BIT1; // Clear P1.1 interrupt flag
 			break;
 		case (BIT1+BIT0):
-			if !(bothPressed) {
+			if (bothPressed == 0) {
 				for (int i=10000;i>0;i--);
 				if (SW1+SW2 == 0) {
 					bothPressed = 1; // Set flag
-					WDTCTL ^= (WDT_ADLY_1000 ^ (WDTPW | WDTHOLD)); // Toggle necessary bits in WDTCTL to switch between stop mode and 1000 ms interval mode
+					WDTCTL = WDT_ADLY_1000; // Switch between stop mode and 1000 ms interval mode
 					P1IES &= ~(BIT1+BIT0); // Change interrupt trigger to rising edge to catch button release
 				}
-			} else if (bothPressed) {
+			} else if (bothPressed == 1) {
 				for (int i=10000;i>0;i--);
 				if (SW1+SW2 ==  BIT1+BIT0) {
 					bothPressed = 0; // Clear flag
-					WDTCTL ^= (WDT_ADLY_1000 ^ (WDTPW | WDTHOLD)); // Toggle necessary bits in WDTCTL to switch between stop mode and 1000 ms interval mode
+					WDTCTL = (WDTPW | WDTHOLD); // Switch between stop mode and 1000 ms interval mode
 					P1IES |= BIT1+BIT0; // Restore interrupt trigger to falling edge
 				}
 			}
