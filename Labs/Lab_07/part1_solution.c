@@ -68,24 +68,24 @@ __interrupt void P1ISR(void) {
 			}
 			P1IFG &= ~BIT1; // Clear P1.1 interrupt flag
 			break;
-		case (BIT1+BIT0):
-			if (bothPressed == 0) {
-				for (int i=10000;i>0;i--);
-				if (SW1+SW2 == 0) {
-					bothPressed = 1; // Set flag
-					WDTCTL = WDT_ADLY_1000; // Switch between stop mode and 1000 ms interval mode
-					P1IES &= ~(BIT1+BIT0); // Change interrupt trigger to rising edge to catch button release
-				}
-			} else if (bothPressed == 1) {
-				for (int i=10000;i>0;i--);
-				if (SW1+SW2 ==  BIT1+BIT0) {
-					bothPressed = 0; // Clear flag
-					WDTCTL = (WDTPW | WDTHOLD); // Switch between stop mode and 1000 ms interval mode
-					P1IES |= BIT1+BIT0; // Restore interrupt trigger to falling edge
-				}
-			}
-			P1IFG &= ~(BIT1+BIT0); // Clear interrupts
-			break;
+		// case (BIT1+BIT0):
+		// 	if (bothPressed == 0) {
+		// 		for (int i=10000;i>0;i--);
+		// 		if (SW1+SW2 == 0) {
+		// 			bothPressed = 1; // Set flag
+		// 			WDTCTL = WDT_ADLY_1000; // Switch between stop mode and 1000 ms interval mode
+		// 			P1IES &= ~(BIT1+BIT0); // Change interrupt trigger to rising edge to catch button release
+		// 		}
+		// 	} else if (bothPressed == 1) {
+		// 		for (int i=10000;i>0;i--);
+		// 		if (SW1+SW2 ==  BIT1+BIT0) {
+		// 			bothPressed = 0; // Clear flag
+		// 			WDTCTL = (WDTPW | WDTHOLD); // Switch between stop mode and 1000 ms interval mode
+		// 			P1IES |= BIT1+BIT0; // Restore interrupt trigger to falling edge
+		// 		}
+		// 	}
+		// 	P1IFG &= ~(BIT1+BIT0); // Clear interrupts
+		// 	break;
 	}
 	TBCCR1 = brightness[level];
 }
