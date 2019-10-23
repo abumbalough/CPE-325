@@ -77,7 +77,7 @@ void UART_initialize(void) {
     UCA0BR0 = 54; // Sets Baud rate to 19200 bps
     UCA0BR1 = 0; // 2^20/19200 = 54r5
     UCA0MCTL = 0x0A; // UCBRS0 = 5, UCOS16 = 0
-    IE2 |= UCA0RXIE; // Rx Interrupt enable
+    // IE2 |= UCA0RXIE; // Rx Interrupt enable
 }
 
 void UART_sendCharacter(char c) {
