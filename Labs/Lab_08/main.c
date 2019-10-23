@@ -35,15 +35,12 @@ void UART_sendString(char*);
 void UART_getLine(char*, int);
 
 void main(void) {
-	WDTCTL = WDTPW | WDTHOLD; // stop watchdog timer
-	P5DIR |= BIT1; // LED4
+	WDTCTL = WDT_ADLY_1000; // 1 s interval
+	IE1 |= WDTIE; // Enable WDT interrupt
 	UART_initialize();
-	UCA0CTL1 &= ~UCSWRST;
-	// _BIS_SR(LPM0_bits + GIE); // Low-power mode 0, interrupts enabled
+	UCA0CTL1 &= ~UCSWRST; // Start USCI
+	_BIS_SR(GIE);
 	
-	// char key[] = "Hey, Bot!";
-	// char meStr[] = "Me: ";
-	// char botStr[] = "Bot: ";
 	char wakeStr[25];
 	while(1) {
 		UART_sendString("\e[91mMe: \e[0m");
@@ -109,8 +106,11 @@ void UART_getLine(char* buffer, int limit) {
 	buffer[i] = (char) NULL; // Terminate string with null character
 }
 
-#pragma vector=USCIAB0RX_VECTOR
-__interrupt void USCIA0RX_ISR(void) {
-    UCA0TXBUF = UCA0RXBUF; // Echo the character back
-    P5OUT ^= BIT1; // Toggle LED4
+#pragma vector=WDT_VECTOR
+__interrupt void WDT_ISR(void) {
+    static unsigned int delayCount = 0;
+    if (delayCount++ > 15) {
+        UART_sendString("\e[34m\r\nBot: \e[0mIs anybody here?\r\n");
+        delayCount = 0;
+    }
 }
