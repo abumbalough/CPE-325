@@ -4,9 +4,26 @@
 
 #define NULL 0
 
-/**
- * main.c
- */
+/*
+--------------------------------------------------------
+*
+File: Lab_08/main.c
+*
+Description: Create a serial communication chatbot
+*
+Input: Data from USCI Peripheral
+*
+Output: Write data to USCI Peripheral
+*
+Author: Austin Bumbalough
+*
+Lab Section: 8
+*
+Date: 10/24/2019
+*
+--------------------------------------------------------
+*/
+
 void UART_initialize(void);
 
 void UART_sendCharacter(char);
