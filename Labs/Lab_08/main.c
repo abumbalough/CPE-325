@@ -46,19 +46,19 @@ void main(void) {
 	// char botStr[] = "Bot: ";
 	char wakeStr[25];
 	while(1) {
-		UART_sendString("Me: ");
+		UART_sendString("\e[91mMe: \e[0m");
 		UART_getLine(wakeStr, 25); // Get line
 		while((strcmp("Hey, Bot!",wakeStr))) {
 			UART_sendString("\r\n"); // send carriage return and newline
-			UART_sendString("Me: ");
+			UART_sendString("\e[91mMe: \e[0m");
 			UART_getLine(wakeStr, 25);
 		} UART_sendString("\r\n");
 		
 		char ageStr[10];
-		UART_sendString("Bot: Hi! How old are you?\r\n"); // Send chatbot reply to key phrase
-		UART_sendString("Me: ");
+		UART_sendString("\e[34mBot: \e[0mHi! How old are you?\r\n"); // Send chatbot reply to key phrase
+		UART_sendString("\e[91mMe: \e[0m");
 		UART_getLine(ageStr, 10); // Get user's age
-		UART_sendString("\r\nBot: ");
+		UART_sendString("\r\n\e[34mBot: \e[0m");
 		if (!(strcmp("1000",ageStr))) { // If user enters "1000"
 			UART_sendString("That cannot be true!\r\n");
 		} else {
