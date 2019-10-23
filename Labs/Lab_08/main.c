@@ -48,7 +48,7 @@ void main(void) {
 	while(1) {
 		UART_sendString("Me: ");
 		UART_getLine(wakeStr, 25); // Get line
-		while(!(strcmp("Hey, Bot!",wakeStr))) {
+		while((strcmp("Hey, Bot!",wakeStr))) {
 			UART_sendString("\r\n"); // send carriage return and newline
 			UART_sendString("Me: ");
 			UART_getLine(wakeStr, 25);
@@ -58,13 +58,13 @@ void main(void) {
 		UART_sendString("Bot: Hi! How old are you?\r\n"); // Send chatbot reply to key phrase
 		UART_sendString("Me: ");
 		UART_getLine(ageStr, 10); // Get user's age
-		UART_sendString("Bot: ");
+		UART_sendString("\r\nBot: ");
 		if (!(strcmp("1000",ageStr))) { // If user enters "1000"
 			UART_sendString("That cannot be true!\r\n");
 		} else {
 			UART_sendString("You are so young! I am 1"); // Respond to user age
 			UART_sendString(ageStr);
-			UART_sendString("\r\n");
+			UART_sendString(" years old.\r\n");
 		}
 	}
 }
@@ -91,7 +91,7 @@ char UART_getCharacter(void) {
 }
 
 void UART_sendString(char* string) {
-	int i = 0;
+	unsigned int i = 0;
 	while (string[i] != (char) NULL) {
 		UART_sendCharacter(string[i++]); // Send each character in string 
 	}
@@ -99,9 +99,9 @@ void UART_sendString(char* string) {
 
 void UART_getLine(char* buffer, int limit) {
 	char c = UART_getCharacter();
-	int i = 0;
+	unsigned int i = 0;
 	
-	while ((c != '\n') & (i < limit-1)) {
+	while ((c != '\r') & (i < limit-1)) {
 		buffer[i++] = c; // Store received character in receive buffer
 		UART_sendCharacter(c); // Echo character back
 		c = UART_getCharacter(); // Get next character
