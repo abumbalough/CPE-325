@@ -24,6 +24,8 @@ Date: 10/24/2019
 --------------------------------------------------------
 */
 
+unsigned int delayCount = 0;
+
 void UART_initialize(void);
 
 void UART_sendCharacter(char);
@@ -45,7 +47,7 @@ void main(void) {
 	while(1) {
 		UART_sendString("\e[91mMe: \e[0m");
 		UART_getLine(wakeStr, 25); // Get line
-		while((strcmp("Hey, Bot!",wakeStr))) {
+		while(strcmp("Hey, Bot!",wakeStr)) {
 			UART_sendString("\r\n"); // send carriage return and newline
 			UART_sendString("\e[91mMe: \e[0m");
 			UART_getLine(wakeStr, 25);
@@ -80,10 +82,12 @@ void UART_initialize(void) {
 void UART_sendCharacter(char c) {
 	while (!(IFG2 & UCA0TXIFG)); // Wait until Tx buffer is ready to receive char
 	UCA0TXBUF = c; // Move c into Tx buffer
+	delayCount = 0;
 }
 
 char UART_getCharacter(void) {
 	while (!(IFG2 & UCA0RXIFG)); // Wait until a character is ready to be read from Rx buffer
+	delayCount = 0;
 	return UCA0RXBUF;
 }
 
@@ -108,9 +112,9 @@ void UART_getLine(char* buffer, int limit) {
 
 #pragma vector=WDT_VECTOR
 __interrupt void WDT_ISR(void) {
-    static unsigned int delayCount = 0;
-    if (delayCount++ > 15) {
+    if (delayCount++ > 15) { // 15 second delay
         UART_sendString("\e[34m\r\nBot: \e[0mIs anybody here?\r\n");
+        UART_sendString("\e[91mMe: \e[0m");
         delayCount = 0;
     }
 }
