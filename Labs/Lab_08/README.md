@@ -7,7 +7,7 @@ Lab 08
 In Lab 8 I configured the UCI peripheral for UART communication and wrote a C program for a for a chat bot the responds to the wake phrase, "Hey, Bot!".
 
 ## Output Screenshots
-![Output1](Labs/Lab_08/Documentation/Capture_3_marked.jpg)
+![Output1](Documentation/Capture_3_marked.jpg)
 
 ## Source Code
 ```C
