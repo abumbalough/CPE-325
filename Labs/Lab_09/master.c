@@ -87,6 +87,7 @@ char SPI_getChar(void) {
 void SPI_getState(void) {
 	char pauseStr[20];
 	SPI_putChar(0x00);
+	for (int k=1000;k>0;k--); // Give slave time to load transmit register
 	spiRx = SPI_getChar();
 	sprintf(pauseStr,"Current pause: %u\r\n",spiRx);
 	UART_putStr(pauseStr);
