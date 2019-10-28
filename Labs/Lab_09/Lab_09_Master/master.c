@@ -137,7 +137,7 @@ void UART_putChar(char c) {
 }
 
 void UART_putStr(char* message) {
-    int i;
+    unsigned int i;
     for(i = 0; message[i] != 0; i++) {
         UART_putChar(message[i]);
     }
