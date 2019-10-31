@@ -1,9 +1,26 @@
 #include <msp430.h> 
 
 
-/**
- * main.c
- */
+/*
+--------------------------------------------------------
+*
+File:
+*
+Description:
+*
+Input:
+*
+Output:
+*
+Author: Austin Bumbalough
+*
+Lab Section: 8
+*
+Date:
+*
+--------------------------------------------------------
+*/
+
 int main(void)
 {
 	WDTCTL = WDTPW | WDTHOLD;	// stop watchdog timer
