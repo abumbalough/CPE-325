@@ -9,6 +9,7 @@ Lab 10
 In Lab 10 Part 1, I interfaced a three-axis accelerometer with the ADC12 peripheral of the MSP430FG4618. I then converted the ADC values to acceleration and sent them over UART to the UAH Serial App for plotting the three values against time. 
 
 ### Output Screenshots
+![SerialApp](Documentation/accelerometer.png)
 
 ### Source Code
 ```C
@@ -241,6 +242,8 @@ __interrupt void TimerB_ISR(void) {
 In part three, I used a lookup table of DAC input values to generate either a sine wave or a saw wave, selected by SW1.
 
 ### Oscilloscope Output
+![SineWave](Documentation/sine.png)
+![SawWave](Documentation/saw.png)
 
 ### Source Code
 ```C
