@@ -39,36 +39,52 @@ void main(void) {
     P1IE |= BIT1+BIT0; // Enable interrupts for P1.0 and P1.1
     TimerA_Setup();
     DAC12_Setup();
-    _BIS_SR(LPM0_bits + GIE);
+    _EINT();
+
+    unsigned int j = 0;
+    while(1) {
+        _BIS_SR(LPM0_bits + GIE);
+        DAC12_0DAT = (WAVE_TABLE[WAVE_SEL][j++ % 512]) / HALF;
+    }
 }
 
 void DAC12_Setup(void) {
     ADC12CTL0 = REF2_5V + REFON;
     for (unsigned int i = 50000;i>0;i--); // Delay to allow Vref to stabilize
-    DAC12_0CTL = DAC12IR + DAC12AMP_5;
+    DAC12_0CTL = DAC12IR + DAC12AMP_5 + DAC12ENC;
 }
 
 void TimerA_Setup(void) {
     TA0CTL = TASSEL_2 + MC_1;
-    TA0CCR0 = 82; // 25 Hz signal
+    TA0CCR0 = 41; // 25 Hz signal
     TA0CCTL0 = CCIE;
 }
 
 #pragma vector=PORT1_VECTOR
 __interrupt void P1_ISR(void) {
+
     if (P1IFG & BIT0) {
         for (unsigned int i = 20952;i>0;i--); // 20 ms debounce using SMCLK = 2^20 Hz
-        if ((P1IN & BIT0) == 0) { // Check if switch is still pressed
-            WAVE_SEL = (WAVE_SEL + 1) % 2; // Toggle between sine and saw wave
-            P1IES ^= BIT0; // Toggle interrupt edge select to catch switch release
+        if (((P1IN & BIT0) == 0) & (WAVE_SEL == 0)) { // Check if switch is still pressed
+            WAVE_SEL = 1; // Toggle between sine and saw wave
+            P1IES &= ~BIT0; // Toggle interrupt edge select to catch switch release
+        } else if (((P1IN & BIT0) == 1) & (WAVE_SEL == 1)) {
+            WAVE_SEL = 0;
+            P1IES |= BIT0;
         }
         P1IFG &= ~BIT0; // Clear IFG
-    } else if (P1IFG & BIT1) {
+    }
+
+    if (P1IFG & BIT1) {
         for (unsigned int i = 20952;i>0;i--); // 20 ms debounce using SMCLK = 2^20 Hz
-        if ((P1IN & BIT0) == 0) { // Check if switch is still pressed   
-            if (HALF == 1) HALF = 2;
-            else HALF = 1;
-            P1IES ^= BIT1; // Toggle interrupt edge select to catch switch release
+        if (((P1IN & BIT0) == 0) & ((P1IES & BIT1) == 1)) { // Check if switch is still pressed
+            HALF = 2;
+            P1IES &= ~BIT1; // Toggle interrupt edge select to catch switch release
+        }
+
+        if (((P1IN & BIT0) == 1) & ((P1IES & BIT1) == 0)) {
+            HALF = 1;
+            P1IES |= BIT1;
         }
         P1IFG &= ~BIT1; // Clear IFG
     }
@@ -76,8 +92,7 @@ __interrupt void P1_ISR(void) {
 
 #pragma vector=TIMERA0_VECTOR
 __interrupt void TimerA0_ISR(void) {
-    static unsigned int j = 0;
-    DAC12_0DAT = WAVE_TABLE[WAVE_SEL][j++ % 512] / HALF;
+    __bic_SR_register_on_exit(LPM0_bits); // Exit LPM0
 }
 
 

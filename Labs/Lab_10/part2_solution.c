@@ -41,18 +41,18 @@ void main(void)
     WDTCTL = WDTPW | WDTHOLD;   // stop watchdog timer
     P2DIR |= BIT2; // Configure P2.2 as output
     P1DIR &= ~BIT0; // Configure P1.0 as input
-	P1IES |= BIT1 + BIT0; // Select falling edge for interrupt trigger
+	P1IES |= BIT0; // Select falling edge for interrupt trigger
     P1IE |= BIT0; // Enable interrupts for P1.0 (SW1)
     TimerB_Setup(); // Initialize Timer B
     ADC_Setup(); // Initialize ADC
+    UART_Setup();
     _EINT();
 
     while(1) {
         ADC12CTL0 |= ADC12SC;
         _BIS_SR(LPM0_bits + GIE);
+        if (crashDetected) P2OUT |= BIT2;
     }
-    
-    if (crashDetected) P2OUT |= BIT2;
 }
 
 void ADC_Setup(void) {
@@ -70,9 +70,9 @@ void ADC_Setup(void) {
 void sendData(void) {
     unsigned int i;
     
-    X_ACC = ((ADCX / 4095 * 10) - 5);    // Calculate output x acceleration
-    Y_ACC = ((ADCY / 4095 * 10) - 5);    // Calculate output y acceleration
-    Z_ACC = ((ADCZ / 4095 * 10) - 5);    // Calculate output z acceleration
+    X_ACC = ((ADCX / 4095.0 * 10.0) - 5);    // Calculate output x acceleration
+    Y_ACC = ((ADCY / 4095.0 * 10.0) - 5);    // Calculate output y acceleration
+    Z_ACC = ((ADCZ / 4095.0 * 10.0) - 5);    // Calculate output z acceleration
     
     // Use character pointers to send one byte at a time
     char *X_ACC_pnt = (char *)&X_ACC;
@@ -80,15 +80,15 @@ void sendData(void) {
     char *Z_ACC_pnt = (char *)&Z_ACC;
 
     UART_PutChar(0x55);            // Send header
-    for(i = 4;i>0;i--) {            // Send x acceleration - one byte at a time
+    for(i = 0;i<4;i++) {            // Send x acceleration - one byte at a time
         UART_PutChar(X_ACC_pnt[i]);
     }
     
-    for(i = 4;i>0;i--) {            // Send y acceleration - one byte at a time
+    for(i = 0;i<4;i++) {            // Send y acceleration - one byte at a time
         UART_PutChar(Y_ACC_pnt[i]);
     }
     
-    for(i = 4;i>0;i--) {            // Send z acceleration - one byte at a time
+    for(i = 0;i<4;i++) {            // Send z acceleration - one byte at a time
         UART_PutChar(Z_ACC_pnt[i]);
     }
 }
@@ -129,13 +129,14 @@ __interrupt void P1_ISR(void) {
         P2OUT &= ~BIT2; // Turn off led
         crashDetected = 0; // reset flag
     }
+    P1IFG &= ~BIT0;
 }
 
 #pragma vector = TIMERB0_VECTOR
 __interrupt void TimerB_ISR(void) {
     sendData();
     if (crashDetected == 0) {
-        float net_acc = sqrt( pow(X_ACC,2) + pow(Y_ACC,2) + pow(Z_ACC,2) );
+        float net_acc = sqrt( pow(X_ACC,2) + pow(Y_ACC,2)); // + pow(Z_ACC,2) );
         if (net_acc > 2) crashDetected = 1; // Set flag if net acceleration exceeds 2g
     }
     __bic_SR_register_on_exit(LPM0_bits); // Exit LPM0

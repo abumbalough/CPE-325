@@ -36,6 +36,7 @@ void main(void)
     WDTCTL = WDTPW | WDTHOLD;   // stop watchdog timer
     TimerB_Setup(); // Initialize Timer B
     ADC_Setup(); // Initialize ADC
+    UART_Setup();
     _EINT();
 
     while(1) {
@@ -60,9 +61,9 @@ void sendData(void) {
     volatile float x_acc, y_acc, z_acc;
     unsigned int i;
     
-    x_acc = ((ADCX / 4095 * 10) - 5);    // Calculate output x acceleration
-    y_acc = ((ADCY / 4095 * 10) - 5);    // Calculate output y acceleration
-    z_acc = ((ADCZ / 4095 * 10) - 5);    // Calculate output z acceleration
+    x_acc = ((ADCX / 4095.0 * 10.0) - 5);    // Calculate output x acceleration
+    y_acc = ((ADCY / 4095.0 * 10.0) - 5);    // Calculate output y acceleration
+    z_acc = ((ADCZ / 4095.0 * 10.0) - 5);    // Calculate output z acceleration
     
     // Use character pointers to send one byte at a time
     char *x_acc_pnt = (char *)&x_acc;
