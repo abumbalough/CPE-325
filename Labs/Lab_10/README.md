@@ -28,6 +28,7 @@ void main(void)
     WDTCTL = WDTPW | WDTHOLD;   // stop watchdog timer
     TimerB_Setup(); // Initialize Timer B
     ADC_Setup(); // Initialize ADC
+    UART_Setup();
     _EINT();
 
     while(1) {
@@ -52,9 +53,9 @@ void sendData(void) {
     volatile float x_acc, y_acc, z_acc;
     unsigned int i;
     
-    x_acc = ((ADCX / 4095 * 10) - 5);    // Calculate output x acceleration
-    y_acc = ((ADCY / 4095 * 10) - 5);    // Calculate output y acceleration
-    z_acc = ((ADCZ / 4095 * 10) - 5);    // Calculate output z acceleration
+    x_acc = ((ADCX / 4095.0 * 10.0) - 5);    // Calculate output x acceleration
+    y_acc = ((ADCY / 4095.0 * 10.0) - 5);    // Calculate output y acceleration
+    z_acc = ((ADCZ / 4095.0 * 10.0) - 5);    // Calculate output z acceleration
     
     // Use character pointers to send one byte at a time
     char *x_acc_pnt = (char *)&x_acc;
@@ -136,18 +137,18 @@ void main(void)
     WDTCTL = WDTPW | WDTHOLD;   // stop watchdog timer
     P2DIR |= BIT2; // Configure P2.2 as output
     P1DIR &= ~BIT0; // Configure P1.0 as input
-	P1IES |= BIT1 + BIT0; // Select falling edge for interrupt trigger
+	P1IES |= BIT0; // Select falling edge for interrupt trigger
     P1IE |= BIT0; // Enable interrupts for P1.0 (SW1)
     TimerB_Setup(); // Initialize Timer B
     ADC_Setup(); // Initialize ADC
+    UART_Setup();
     _EINT();
 
     while(1) {
         ADC12CTL0 |= ADC12SC;
         _BIS_SR(LPM0_bits + GIE);
+        if (crashDetected) P2OUT |= BIT2;
     }
-    
-    if (crashDetected) P2OUT |= BIT2;
 }
 
 void ADC_Setup(void) {
@@ -165,9 +166,9 @@ void ADC_Setup(void) {
 void sendData(void) {
     unsigned int i;
     
-    X_ACC = ((ADCX / 4095 * 10) - 5);    // Calculate output x acceleration
-    Y_ACC = ((ADCY / 4095 * 10) - 5);    // Calculate output y acceleration
-    Z_ACC = ((ADCZ / 4095 * 10) - 5);    // Calculate output z acceleration
+    X_ACC = ((ADCX / 4095.0 * 10.0) - 5);    // Calculate output x acceleration
+    Y_ACC = ((ADCY / 4095.0 * 10.0) - 5);    // Calculate output y acceleration
+    Z_ACC = ((ADCZ / 4095.0 * 10.0) - 5);    // Calculate output z acceleration
     
     // Use character pointers to send one byte at a time
     char *X_ACC_pnt = (char *)&X_ACC;
@@ -175,15 +176,15 @@ void sendData(void) {
     char *Z_ACC_pnt = (char *)&Z_ACC;
 
     UART_PutChar(0x55);            // Send header
-    for(i = 4;i>0;i--) {            // Send x acceleration - one byte at a time
+    for(i = 0;i<4;i++) {            // Send x acceleration - one byte at a time
         UART_PutChar(X_ACC_pnt[i]);
     }
     
-    for(i = 4;i>0;i--) {            // Send y acceleration - one byte at a time
+    for(i = 0;i<4;i++) {            // Send y acceleration - one byte at a time
         UART_PutChar(Y_ACC_pnt[i]);
     }
     
-    for(i = 4;i>0;i--) {            // Send z acceleration - one byte at a time
+    for(i = 0;i<4;i++) {            // Send z acceleration - one byte at a time
         UART_PutChar(Z_ACC_pnt[i]);
     }
 }
@@ -224,13 +225,14 @@ __interrupt void P1_ISR(void) {
         P2OUT &= ~BIT2; // Turn off led
         crashDetected = 0; // reset flag
     }
+    P1IFG &= ~BIT0;
 }
 
 #pragma vector = TIMERB0_VECTOR
 __interrupt void TimerB_ISR(void) {
     sendData();
     if (crashDetected == 0) {
-        float net_acc = sqrt( pow(X_ACC,2) + pow(Y_ACC,2) + pow(Z_ACC,2) );
+        float net_acc = sqrt( pow(X_ACC,2) + pow(Y_ACC,2)); // + pow(Z_ACC,2) );
         if (net_acc > 2) crashDetected = 1; // Set flag if net acceleration exceeds 2g
     }
     __bic_SR_register_on_exit(LPM0_bits); // Exit LPM0
@@ -264,36 +266,52 @@ void main(void) {
     P1IE |= BIT1+BIT0; // Enable interrupts for P1.0 and P1.1
     TimerA_Setup();
     DAC12_Setup();
-    _BIS_SR(LPM0_bits + GIE);
+    _EINT();
+
+    unsigned int j = 0;
+    while(1) {
+        _BIS_SR(LPM0_bits + GIE);
+        DAC12_0DAT = (WAVE_TABLE[WAVE_SEL][j++ % 512]) / HALF;
+    }
 }
 
 void DAC12_Setup(void) {
     ADC12CTL0 = REF2_5V + REFON;
     for (unsigned int i = 50000;i>0;i--); // Delay to allow Vref to stabilize
-    DAC12_0CTL = DAC12IR + DAC12AMP_5;
+    DAC12_0CTL = DAC12IR + DAC12AMP_5 + DAC12ENC;
 }
 
 void TimerA_Setup(void) {
     TA0CTL = TASSEL_2 + MC_1;
-    TA0CCR0 = 82; // 25 Hz signal
+    TA0CCR0 = 41; // 25 Hz signal
     TA0CCTL0 = CCIE;
 }
 
 #pragma vector=PORT1_VECTOR
 __interrupt void P1_ISR(void) {
+
     if (P1IFG & BIT0) {
         for (unsigned int i = 20952;i>0;i--); // 20 ms debounce using SMCLK = 2^20 Hz
-        if ((P1IN & BIT0) == 0) { // Check if switch is still pressed
-            WAVE_SEL = (WAVE_SEL + 1) % 2; // Toggle between sine and saw wave
-            P1IES ^= BIT0; // Toggle interrupt edge select to catch switch release
+        if (((P1IN & BIT0) == 0) & (WAVE_SEL == 0)) { // Check if switch is still pressed
+            WAVE_SEL = 1; // Toggle between sine and saw wave
+            P1IES &= ~BIT0; // Toggle interrupt edge select to catch switch release
+        } else if (((P1IN & BIT0) == 1) & (WAVE_SEL == 1)) {
+            WAVE_SEL = 0;
+            P1IES |= BIT0;
         }
         P1IFG &= ~BIT0; // Clear IFG
-    } else if (P1IFG & BIT1) {
+    }
+
+    if (P1IFG & BIT1) {
         for (unsigned int i = 20952;i>0;i--); // 20 ms debounce using SMCLK = 2^20 Hz
-        if ((P1IN & BIT0) == 0) { // Check if switch is still pressed   
-            if (HALF == 1) HALF = 2;
-            else HALF = 1;
-            P1IES ^= BIT1; // Toggle interrupt edge select to catch switch release
+        if (((P1IN & BIT0) == 0) & ((P1IES & BIT1) == 1)) { // Check if switch is still pressed
+            HALF = 2;
+            P1IES &= ~BIT1; // Toggle interrupt edge select to catch switch release
+        }
+
+        if (((P1IN & BIT0) == 1) & ((P1IES & BIT1) == 0)) {
+            HALF = 1;
+            P1IES |= BIT1;
         }
         P1IFG &= ~BIT1; // Clear IFG
     }
@@ -301,7 +319,6 @@ __interrupt void P1_ISR(void) {
 
 #pragma vector=TIMERA0_VECTOR
 __interrupt void TimerA0_ISR(void) {
-    static unsigned int j = 0;
-    DAC12_0DAT = WAVE_TABLE[WAVE_SEL][j++ % 512] / HALF;
+    __bic_SR_register_on_exit(LPM0_bits); // Exit LPM0
 }
 ```

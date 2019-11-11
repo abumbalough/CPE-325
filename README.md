@@ -11,4 +11,6 @@ Graduate Teaching Assistant: Igor Semenov
 [Lab 07](Labs/Lab_07)  
 [Lab 08](Labs/Lab_08)  
 [Lab 09](Labs/Lab_09)  
+[Lab 10](Labs/Lab_10)  
+
 
